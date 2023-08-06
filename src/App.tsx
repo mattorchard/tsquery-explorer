@@ -1,20 +1,20 @@
-import { createSignal, onMount } from "solid-js";
+import { For, createSignal, onMount } from "solid-js";
 import { doTheParse } from "./helpers/ParserHelpers";
+import { TsNode } from "./types";
+import { NodeViewer } from "./components/NodeViewer";
 
 function App() {
-  const [data, setData] = createSignal<any>(null);
+  const [nodes, setNodes] = createSignal<TsNode[]>([]);
 
   onMount(() => {
     const output = doTheParse();
     console.log("Output", output);
-    setData(output);
+    setNodes(output);
   });
 
   return (
     <>
-      <pre>
-        <code>{JSON.stringify(data, null, 2)}</code>
-      </pre>
+      <For each={nodes()}>{(node) => <NodeViewer node={node} />}</For>
     </>
   );
 }
