@@ -34,8 +34,7 @@ function App() {
 
   createEffect(() => {
     // Todo: Proper async handling
-    if (!query()) setAllNodes(new Map());
-    else handleSearch(query(), files()).then(setAllNodes);
+    handleSearch(query(), files()).then(setAllNodes);
   });
 
   const handleOpenFolder = async () => {
@@ -61,7 +60,7 @@ function App() {
         <QueryInput defaultValue={query()} onChange={setQuery} />
       </header>
       <main
-        style={{ display: "grid", "grid-template-columns": "240px 240px  1fr" }}
+        style={{ display: "grid", "grid-template-columns": "240px 480px  1fr" }}
         class="gap-1 overflow-hidden"
       >
         <section class="overflow-auto">
@@ -89,7 +88,9 @@ function App() {
                     onClick={() => setSelectedFile(file)}
                     class="w-full px-2 text-start transition-colors hover:bg-slate-800"
                     classList={{
-                      "text-white/30": !allNodes().get(file.path)?.length,
+                      "text-white/30": !!(
+                        query() && !allNodes().get(file.path)?.length
+                      ),
                     }}
                   >
                     {file.name}
@@ -99,13 +100,13 @@ function App() {
             </For>
           </ol>
         </section>
-        <section>
+        <section class="overflow-auto">
           <For each={selectedNodes()}>
             {(node) => (
               <NodeViewer node={node} onPointer={setIndexRange} depth={0} />
             )}
           </For>
-          <Show when={selectedFile() && selectedNodes().length === 0}>
+          <Show when={selectedFile() && !selectedNodes().length}>
             <p>No results in {selectedFile()?.path}</p>
           </Show>
         </section>
@@ -120,7 +121,7 @@ function App() {
   );
 }
 
-const defaultQuery = "ImportDeclaration:has(StringLiteral[text=react])";
+const defaultQuery = "" && "ImportDeclaration:has(StringLiteral[text=react])";
 
 const grabCodeFilesFromFolder = async (
   rootDirectory: FileSystemDirectoryHandle,

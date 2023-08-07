@@ -25,7 +25,8 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
 
   createEffect(() => {
     const model = editor.getModel();
-    if (!model) return;
+    decorations.clear();
+    if (!model || !props.highlight.endIndex) return;
     const startPosition = model.getPositionAt(props.highlight.startIndex);
     const endPosition = model.getPositionAt(props.highlight.endIndex);
     decorations.set([

@@ -2,6 +2,7 @@ import { Component, For, Show, createSignal } from "solid-js";
 import { IndexRange, TsNode } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
 import { ExpandChevron } from "./ExpandChevron";
+import { isOneOf } from "../helpers/CollectionHelpers";
 
 export const NodeViewer: Component<{
   node: TsNode;
@@ -21,6 +22,8 @@ export const NodeViewer: Component<{
     startIndex: props.node.getStart(),
     endIndex: props.node.getEnd(),
   };
+
+  if (isIgnorableNode(nodeProperties.kindName)) return null;
 
   return (
     <div onPointerEnter={() => props.onPointer(indexRange)}>
@@ -46,7 +49,7 @@ export const NodeViewer: Component<{
         </span>
       </button>
       <Show when={isExpanded()}>
-        <ol class="ps-2">
+        <ol class="border-l-[1px] border-dashed border-transparent ps-1 transition-colors hover:border-white/40">
           <For each={childNodes}>
             {(node) => (
               <li>
@@ -64,4 +67,6 @@ export const NodeViewer: Component<{
   );
 };
 
-const AUTO_EXPAND_DEPTH = 3;
+const isIgnorableNode = isOneOf(["SemicolonToken"]);
+
+const AUTO_EXPAND_DEPTH = 10;
