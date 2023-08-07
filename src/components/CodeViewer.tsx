@@ -43,6 +43,7 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
         },
       },
     ]);
+    editor.revealLineInCenter(startPosition.lineNumber);
   });
 
   return (
