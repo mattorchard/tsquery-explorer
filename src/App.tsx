@@ -14,10 +14,14 @@ import { QueryInput } from "./components/QueryInput";
 import { handleSearch } from "./helpers/SearchHelpers";
 import { CodeViewer } from "./components/CodeViewer";
 import { ProjectRepository } from "./utils/ProjectRepo";
+import { unwrap } from "solid-js/store";
+import { exportToConsole } from "./helpers/ExportHelpers";
 
 function App() {
   const [lastProject] = createResource(ProjectRepository.getLastProject);
-  const [query, setQuery] = createSignal("");
+  const [query, setQuery] = createSignal(
+    localStorage.getItem("DEBUG_QUERY") || "",
+  );
   const [selectedFile, setSelectedFile] = createSignal<FileContent | null>(
     null,
   );
@@ -45,10 +49,14 @@ function App() {
     setFiles(await grabCodeFilesFromFolder(rootDirectory));
   };
 
-  const restoreLastProject = async () => {
+  const handleRestoreLastProject = async () => {
     const project = lastProject();
     if (!project) return;
     setFiles(await grabCodeFilesFromFolder(project.root));
+  };
+
+  const handleDumpToConsole = () => {
+    exportToConsole(unwrap(files()), unwrap(allNodes()));
   };
 
   return (
@@ -56,8 +64,9 @@ function App() {
       class="max-h-screen min-h-screen gap-2 overflow-hidden"
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
-      <header class="border-b-8 border-slate-800">
+      <header class="flex border-b-8 border-slate-800">
         <QueryInput defaultValue={query()} onChange={setQuery} />
+        <button onClick={handleDumpToConsole}>Dump to console</button>
       </header>
       <main
         style={{ display: "grid", "grid-template-columns": "240px 480px  1fr" }}
@@ -66,10 +75,13 @@ function App() {
         <section class="overflow-x-auto overflow-y-scroll">
           <div class="sticky top-0 inline-flex gap-1 overflow-hidden rounded-md">
             <button onClick={handleOpenFolder} class=" bg-cyan-600 p-1 px-2">
-              Open Folder
+              {files().length ? "Change folder" : "Open Folder"}
             </button>
             <Show when={!files().length && lastProject()}>
-              <button class="bg-cyan-600 p-1 px-2" onClick={restoreLastProject}>
+              <button
+                class="bg-cyan-600 p-1 px-2"
+                onClick={handleRestoreLastProject}
+              >
                 Restore ({lastProject()!.root.name})
               </button>
             </Show>
@@ -145,17 +157,3 @@ const grabCodeFilesFromFolder = async (
 const MAX_FILE_COUNT_BEFORE_APPROVAL = 100;
 
 export default App;
-
-// Sample Queries
-/*
-
-VariableDeclaration
-[initializer.expression.name=/^useCue/]
-:has(BindingElement > [name=/^set/])
-
-ImportDeclaration:has(StringLiteral[text=react])
-
-
-VariableDeclaration
-[initializer.expression.name=useContextSafe]
-*/

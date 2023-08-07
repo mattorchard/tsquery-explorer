@@ -36,7 +36,7 @@ export const QueryInput: Component<{
   });
 
   return (
-    <div class="flex flex-col">
+    <div class="flex w-full flex-col">
       <label class="cursor-text p-2">
         <textarea
           placeholder="Search query"
