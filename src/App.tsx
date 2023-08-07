@@ -53,7 +53,7 @@ function App() {
 
   return (
     <div
-      class="max-h-screen min-h-screen overflow-hidden"
+      class="max-h-screen min-h-screen gap-2 overflow-hidden"
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
       <header>
@@ -61,9 +61,9 @@ function App() {
       </header>
       <main
         style={{ display: "grid", "grid-template-columns": "240px 480px  1fr" }}
-        class="gap-1 overflow-hidden"
+        class="overflow-hidden"
       >
-        <section class="overflow-auto">
+        <section class="overflow-x-auto overflow-y-scroll">
           <div class="inline-flex gap-1 overflow-hidden rounded-md">
             <button onClick={handleOpenFolder} class=" bg-cyan-600 p-1 px-2">
               Open Folder
@@ -85,6 +85,7 @@ function App() {
                       "text-white/30": !!(
                         query() && !allNodes().get(file.path)?.length
                       ),
+                      "bg-cyan-700": file === selectedFile(),
                     }}
                   >
                     {file.name}
@@ -94,7 +95,7 @@ function App() {
             </For>
           </ol>
         </section>
-        <section class="overflow-auto">
+        <section class="overflow-x-auto overflow-y-scroll">
           <For each={selectedNodes()}>
             {(node) => (
               <NodeViewer node={node} onPointer={setIndexRange} depth={0} />
@@ -104,7 +105,7 @@ function App() {
             <p>No results in {selectedFile()?.path}</p>
           </Show>
         </section>
-        <section>
+        <section class="overflow-hidden">
           <CodeViewer
             code={selectedFile()?.content ?? ""}
             highlight={indexRange()}

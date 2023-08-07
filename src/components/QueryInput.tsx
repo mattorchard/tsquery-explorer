@@ -21,6 +21,7 @@ export const QueryInput: Component<{
   let timeoutId: number | null = null;
 
   createEffect(() => {
+    matchScrollHeight(ref);
     const currentDraft = draft();
     const newError = currentDraft ? getParserError(currentDraft) ?? "" : "";
     ref.setCustomValidity(newError);
@@ -36,15 +37,17 @@ export const QueryInput: Component<{
 
   return (
     <div class="flex flex-col">
-      <textarea
-        placeholder="Search query"
-        aria-label="Search query"
-        ref={ref!}
-        value={draft()}
-        onInput={(e) => setDraft(e.currentTarget.value)}
-        class="h-[64px] resize-none appearance-none bg-transparent p-2 text-xl"
-      />
-      <div class="text-red-400">
+      <label class="cursor-text p-2">
+        <textarea
+          placeholder="Search query"
+          aria-label="Search query"
+          ref={ref!}
+          value={draft()}
+          onInput={(e) => setDraft(e.currentTarget.value)}
+          class=" resize-none appearance-none bg-transparent text-xl caret-cyan-400 outline-none"
+        />
+      </label>
+      <div class="px-2 text-red-400">
         {parserError()}
         &nbsp;
       </div>
@@ -53,3 +56,8 @@ export const QueryInput: Component<{
 };
 
 const DEBOUNCE_THRESHOLD = 300;
+
+const matchScrollHeight = (element: HTMLElement) => {
+  element.style.height = "0";
+  element.style.height = `${element.scrollHeight}px`;
+};
