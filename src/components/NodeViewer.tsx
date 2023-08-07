@@ -2,6 +2,7 @@ import { Component, For, Show, createSignal } from "solid-js";
 import { IndexRange, TsNode, TsNodeProperties } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
 import { ExpandChevron } from "./ExpandChevron";
+import { handleTreeNavigate } from "../helpers/TreeWalkHelpers";
 
 export const NodeViewer: Component<{
   node: TsNode;
@@ -21,7 +22,7 @@ export const NodeViewer: Component<{
             <NodeViewer
               node={childNode}
               onPointer={props.onPointer}
-              depth={props.depth + 1}
+              depth={props.depth}
             />
           )}
         </For>
@@ -50,20 +51,9 @@ const DetailedNodeViewer: Component<{
   const expandedByDefault = isExpandable && props.depth < AUTO_EXPAND_DEPTH;
   const [isExpanded, setIsExpanded] = createSignal(expandedByDefault);
 
-  const toggleExpansion = () => {
-    setIsExpanded((e) => !e);
-  };
-
-  const handleKeyDown = isExpandable
-    ? (e: KeyboardEvent) => {
-        switch (e.key) {
-          case "ArrowRight":
-            setIsExpanded(true);
-            break;
-          case "ArrowLeft":
-            setIsExpanded(false);
-            break;
-        }
+  const toggleExpansion = isExpandable
+    ? () => {
+        setIsExpanded((e) => !e);
       }
     : undefined;
 
@@ -79,15 +69,19 @@ const DetailedNodeViewer: Component<{
       onPointerOver={handleInteract}
       data-start-index={indexRange.startIndex}
       data-end-index={indexRange.endIndex}
+      data-tree-walk-container={true}
       data-depth={props.depth}
     >
       <button
         type="button"
-        disabled={!isExpandable}
         onClick={toggleExpansion}
-        onKeyDown={handleKeyDown}
+        onKeyDown={handleTreeNavigate}
         onFocus={handleInteract}
-        class="flex w-full items-center px-2 text-start transition-colors hover:bg-slate-800"
+        class="inner-focus-ring flex w-full items-center px-2 text-start transition-colors hover:bg-slate-800"
+        data-tree-walk-focus-target={true}
+        data-is-expandable={isExpandable}
+        data-is-expanded={isExpanded()}
+        data-depth={props.depth}
       >
         <Show when={isExpandable}>
           <span class="pe-1">
@@ -105,7 +99,7 @@ const DetailedNodeViewer: Component<{
         </span>
       </button>
       <Show when={isExpanded()}>
-        <ol class="border-l-[1px] border-dashed border-transparent ps-1 transition-colors hover:border-white/40">
+        <ol class="border-l-[1px] border-dashed border-transparent ps-1 transition-colors focus-within:bg-cyan-700/10 hover:border-white/40">
           <For each={childNodes}>
             {(node) => (
               <li>

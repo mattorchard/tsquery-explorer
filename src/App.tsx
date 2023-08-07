@@ -107,7 +107,10 @@ function App() {
             </For>
           </ol>
         </section>
-        <section class="overflow-x-auto overflow-y-scroll">
+        <section
+          class="overflow-x-auto overflow-y-scroll"
+          data-tree-walk-root={true}
+        >
           <For each={selectedNodes()}>
             {(node) => (
               <NodeViewer node={node} onPointer={setIndexRange} depth={0} />

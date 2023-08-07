@@ -16,3 +16,8 @@
 ::-webkit-scrollbar-thumb {
   background: rgb(30, 41, 59);
 }
+
+.inner-focus-ring:focus:focus-visible {
+  box-shadow: 0 0 0 2px #cffafe inset;
+  outline: none;
+}
