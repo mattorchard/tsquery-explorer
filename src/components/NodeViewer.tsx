@@ -49,9 +49,25 @@ const DetailedNodeViewer: Component<{
   const isExpandable = !!childNodes?.length;
   const expandedByDefault = isExpandable && props.depth < AUTO_EXPAND_DEPTH;
   const [isExpanded, setIsExpanded] = createSignal(expandedByDefault);
+
   const toggleExpansion = () => {
     setIsExpanded((e) => !e);
   };
+
+  const handleKeyDown = isExpandable
+    ? (e: KeyboardEvent) => {
+        switch (e.key) {
+          case "ArrowRight":
+            setIsExpanded(true);
+            break;
+          case "ArrowLeft":
+            setIsExpanded(false);
+            break;
+        }
+      }
+    : undefined;
+
+  const handleInteract = () => props.onPointer(indexRange);
 
   const indexRange = {
     startIndex: props.node.getStart(),
@@ -60,15 +76,17 @@ const DetailedNodeViewer: Component<{
 
   return (
     <div
-      onPointerEnter={() => props.onPointer(indexRange)}
+      onPointerOver={handleInteract}
       data-start-index={indexRange.startIndex}
       data-end-index={indexRange.endIndex}
       data-depth={props.depth}
     >
       <button
         type="button"
-        onClick={toggleExpansion}
         disabled={!isExpandable}
+        onClick={toggleExpansion}
+        onKeyDown={handleKeyDown}
+        onFocus={handleInteract}
         class="flex w-full items-center px-2 text-start transition-colors hover:bg-slate-800"
       >
         <Show when={isExpandable}>
