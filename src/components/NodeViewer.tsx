@@ -1,5 +1,5 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { IndexRange, TsNode } from "../types";
+import { IndexRange, TsNode, TsNodeProperties } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
 import { ExpandChevron } from "./ExpandChevron";
 
@@ -9,6 +9,42 @@ export const NodeViewer: Component<{
   depth: number;
 }> = (props) => {
   const nodeProperties = getProperties(props.node);
+
+  if (isIgnorableNode(nodeProperties.kindName)) return null;
+
+  if (isPassThroughNode(nodeProperties.kindName)) {
+    const childNodes = props.node.getChildren();
+    return (
+      <>
+        <For each={childNodes}>
+          {(childNode) => (
+            <NodeViewer
+              node={childNode}
+              onPointer={props.onPointer}
+              depth={props.depth + 1}
+            />
+          )}
+        </For>
+      </>
+    );
+  }
+
+  return (
+    <DetailedNodeViewer
+      nodeProperties={nodeProperties}
+      node={props.node}
+      onPointer={props.onPointer}
+      depth={props.depth}
+    />
+  );
+};
+
+const DetailedNodeViewer: Component<{
+  node: TsNode;
+  nodeProperties: TsNodeProperties;
+  onPointer: (indexRange: IndexRange) => void;
+  depth: number;
+}> = (props) => {
   const childNodes = props.node.getChildren();
   const isExpandable = !!childNodes?.length;
   const expandedByDefault = isExpandable && props.depth < AUTO_EXPAND_DEPTH;
@@ -22,13 +58,12 @@ export const NodeViewer: Component<{
     endIndex: props.node.getEnd(),
   };
 
-  if (isIgnorableNode(nodeProperties.kindName)) return null;
-
   return (
     <div
       onPointerEnter={() => props.onPointer(indexRange)}
       data-start-index={indexRange.startIndex}
       data-end-index={indexRange.endIndex}
+      data-depth={props.depth}
     >
       <button
         type="button"
@@ -42,12 +77,12 @@ export const NodeViewer: Component<{
           </span>
         </Show>
         <span classList={{ "text-white/70": isExpandable }}>
-          {nodeProperties.kindName}
+          {props.nodeProperties.kindName}
         </span>
         <span class="ml-auto flex gap-1 pl-1 text-white/90">
-          {nodeProperties.name && <em>{nodeProperties.name}</em>}
-          {nodeProperties.value !== undefined && (
-            <em>{`${nodeProperties.value}`}</em>
+          {props.nodeProperties.name && <em>{props.nodeProperties.name}</em>}
+          {props.nodeProperties.value !== undefined && (
+            <em>{`${props.nodeProperties.value}`}</em>
           )}
         </span>
       </button>
@@ -72,5 +107,7 @@ export const NodeViewer: Component<{
 
 const isIgnorableNode = (kind: string) =>
   kind.endsWith("Token") || kind.endsWith("Keyword");
+
+const isPassThroughNode = (kind: string) => kind === "SyntaxList";
 
 const AUTO_EXPAND_DEPTH = 10;
