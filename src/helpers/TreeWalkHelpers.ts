@@ -81,7 +81,7 @@ const getNextFocusTarget = (
 export const handleTreeNavigate = (e: KeyboardEvent) => {
   const walkData = getTreeWalkFocusTargetData(e.currentTarget);
   if (!walkData) return;
-  e.preventDefault();
+  if (e.key.startsWith("Arrow")) e.preventDefault();
   const { depth, isExpandable, isExpanded } = walkData;
   const currentTarget = e.currentTarget as HTMLElement;
   switch (e.key) {
