@@ -1,8 +1,11 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { TsNode } from "../types";
+import { IndexRange, TsNode } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
 
-export const NodeViewer: Component<{ node: TsNode }> = (props) => {
+export const NodeViewer: Component<{
+  node: TsNode;
+  onPointer: (indexRange: IndexRange) => void;
+}> = (props) => {
   const nodeProperties = getProperties(props.node);
   const childNodes = props.node.getChildren();
   const isExpandable = !!childNodes?.length;
@@ -12,8 +15,13 @@ export const NodeViewer: Component<{ node: TsNode }> = (props) => {
     setIsExpanded((e) => !e);
   };
 
+  const indexRange = {
+    startIndex: props.node.getStart(),
+    endIndex: props.node.getEnd(),
+  };
+
   return (
-    <div>
+    <div onPointerEnter={() => props.onPointer(indexRange)}>
       <button
         type="button"
         onClick={toggleExpansion}
@@ -28,7 +36,7 @@ export const NodeViewer: Component<{ node: TsNode }> = (props) => {
           <For each={childNodes}>
             {(node) => (
               <li>
-                <NodeViewer node={node} />
+                <NodeViewer node={node} onPointer={props.onPointer} />
               </li>
             )}
           </For>

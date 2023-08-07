@@ -6,3 +6,8 @@ export type FileContent = {
   content: string;
   byteSize: number;
 };
+
+export type IndexRange = {
+  startIndex: number;
+  endIndex: number;
+};

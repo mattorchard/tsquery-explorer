@@ -6,16 +6,25 @@ import { readBlob } from "./helpers/FileHelpers";
 import { FilesList } from "./components/FIlesList";
 import { QueryInput } from "./components/QueryInput";
 import { handleSearch } from "./helpers/SearchHelpers";
+import { CodeViewer } from "./components/CodeViewer";
 
 // ImportDeclaration:has(StringLiteral[text=react])
 function App() {
   const [query, setQuery] = createSignal("");
   const [files, setFiles] = createSignal<FileContent[]>([]);
   const [nodes, setNodes] = createSignal<TsNode[]>([]);
+  const [indexRange, setIndexRange] = createSignal({
+    startIndex: 0,
+    endIndex: 0,
+  });
 
   createEffect(() => {
     if (!query()) setNodes([]);
-    else handleSearch(query(), files()).then(setNodes);
+    else
+      handleSearch(
+        query() || "ImportDeclaration:has(StringLiteral[text=react])",
+        files(),
+      ).then(setNodes);
   });
 
   const handleOpenFolder = async () => {
@@ -23,11 +32,16 @@ function App() {
   };
 
   return (
-    <div class="p-4">
+    <div
+      class="min-h-screen overflow-hidden"
+      style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
+    >
       <header>
         <QueryInput onChange={setQuery} />
       </header>
-      <div class="flex">
+      <div
+        style={{ display: "grid", "grid-template-columns": "240px 240px  1fr" }}
+      >
         <div>
           <button
             onClick={handleOpenFolder}
@@ -37,8 +51,15 @@ function App() {
           </button>
           <FilesList files={files()} />
         </div>
-
-        <For each={nodes()}>{(node) => <NodeViewer node={node} />}</For>
+        <div>
+          <For each={nodes()}>
+            {(node) => <NodeViewer node={node} onPointer={setIndexRange} />}
+          </For>
+        </div>
+        <CodeViewer
+          code="console.log('hello world')"
+          highlight={indexRange()}
+        />
       </div>
     </div>
   );
