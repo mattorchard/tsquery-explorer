@@ -2,7 +2,6 @@ import { Component, For, Show, createSignal } from "solid-js";
 import { IndexRange, TsNode } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
 import { ExpandChevron } from "./ExpandChevron";
-import { isOneOf } from "../helpers/CollectionHelpers";
 
 export const NodeViewer: Component<{
   node: TsNode;
@@ -67,6 +66,7 @@ export const NodeViewer: Component<{
   );
 };
 
-const isIgnorableNode = (kind: string) => kind.endsWith("Token");
+const isIgnorableNode = (kind: string) =>
+  kind.endsWith("Token") || kind.endsWith("Keyword");
 
 const AUTO_EXPAND_DEPTH = 10;

@@ -64,18 +64,12 @@ function App() {
         class="gap-1 overflow-hidden"
       >
         <section class="overflow-auto">
-          <div class="flex gap-2">
-            <button
-              onClick={handleOpenFolder}
-              class="rounded-md bg-cyan-600 p-1 px-2"
-            >
+          <div class="inline-flex gap-1 overflow-hidden rounded-md">
+            <button onClick={handleOpenFolder} class=" bg-cyan-600 p-1 px-2">
               Open Folder
             </button>
             <Show when={!files().length && lastProject()}>
-              <button
-                class="rounded-md bg-cyan-600 p-1 px-2"
-                onClick={restoreLastProject}
-              >
+              <button class="bg-cyan-600 p-1 px-2" onClick={restoreLastProject}>
                 Restore ({lastProject()!.root.name})
               </button>
             </Show>

@@ -42,7 +42,7 @@ export const QueryInput: Component<{
         ref={ref!}
         value={draft()}
         onInput={(e) => setDraft(e.currentTarget.value)}
-        class="h-[56px] resize-none appearance-none bg-transparent text-xl"
+        class="h-[64px] resize-none appearance-none bg-transparent p-2 text-xl"
       />
       <div class="text-red-400">
         {parserError()}
