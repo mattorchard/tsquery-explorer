@@ -13,7 +13,8 @@
     "esquery": "^1.5.0",
     "monaco-editor": "0.41.0",
     "solid-js": "^1.7.8",
-    "uuid": "9.0.0"
+    "uuid": "9.0.0",
+    "idb": "7.1.1"
   },
   "devDependencies": {
     "@types/esquery": "^1.5.0",
