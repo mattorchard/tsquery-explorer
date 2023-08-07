@@ -1,5 +1,6 @@
 import {
   For,
+  ParentComponent,
   Show,
   createEffect,
   createMemo,
@@ -16,6 +17,7 @@ import { CodeViewer } from "./components/CodeViewer";
 import { ProjectRepository } from "./utils/ProjectRepo";
 import { unwrap } from "solid-js/store";
 import { exportToConsole } from "./helpers/ExportHelpers";
+import { NonIdealState } from "./components/NonIdealState";
 
 function App() {
   const [lastProject] = createResource(ProjectRepository.getLastProject);
@@ -46,12 +48,14 @@ function App() {
     void ProjectRepository.saveProject({ root: rootDirectory }).catch((error) =>
       console.error("Failed to save project", error),
     );
+    setSelectedFile(null);
     setFiles(await grabCodeFilesFromFolder(rootDirectory));
   };
 
   const handleRestoreLastProject = async () => {
     const project = lastProject();
     if (!project) return;
+    setSelectedFile(null);
     setFiles(await grabCodeFilesFromFolder(project.root));
   };
 
@@ -65,71 +69,127 @@ function App() {
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
       <header class="flex border-b-8 border-slate-800">
-        <QueryInput defaultValue={query()} onChange={setQuery} />
-        <button onClick={handleDumpToConsole}>Dump to console</button>
-      </header>
-      <main
-        style={{ display: "grid", "grid-template-columns": "240px 480px  1fr" }}
-        class="overflow-hidden"
-      >
-        <section class="overflow-x-auto overflow-y-scroll">
-          <div class="sticky top-0 inline-flex gap-1 overflow-hidden rounded-md">
-            <button onClick={handleOpenFolder} class=" bg-cyan-600 p-1 px-2">
-              {files().length ? "Change folder" : "Open Folder"}
+        <div class="flex shrink-0 flex-col">
+          <Show when={files().length}>
+            <button
+              type="button"
+              class="bg-cyan-600"
+              onClick={handleDumpToConsole}
+            >
+              Dump to console
             </button>
-            <Show when={!files().length && lastProject()}>
+          </Show>
+        </div>
+
+        <QueryInput defaultValue={query()} onChange={setQuery} />
+      </header>
+
+      <Show
+        when={files().length}
+        fallback={
+          <div class="m-auto">
+            <div
+              class="cursor-pointer transition-all hover:translate-y-[-.25rem] hover:text-cyan-200"
+              onClick={handleOpenFolder}
+            >
+              <NonIdealState illustration="folder" title="Open a folder">
+                To get started: open a folder containing <br /> some{" "}
+                <InlineCode>js</InlineCode> or
+                <InlineCode>ts</InlineCode> files.
+              </NonIdealState>
+            </div>
+            <Show when={lastProject()}>
               <button
-                class="bg-cyan-600 p-1 px-2"
+                type="button"
+                class="absolute bottom-6 left-[50%] translate-x-[-50%] rounded-md bg-cyan-600 p-2 transition-colors hover:bg-cyan-500 active:bg-cyan-700"
                 onClick={handleRestoreLastProject}
               >
-                Restore ({lastProject()!.root.name})
+                Reopen previous folder
               </button>
             </Show>
           </div>
-          <ol>
-            <For each={files()}>
-              {(file) => (
-                <li>
-                  <button
-                    onClick={() => setSelectedFile(file)}
-                    class="w-full px-2 text-start transition-colors hover:bg-slate-800"
-                    classList={{
-                      "text-white/30": !!(
-                        query() && !allNodes().get(file.path)?.length
-                      ),
-                      "bg-cyan-700 hover:bg-cyan-600": file === selectedFile(),
-                    }}
-                  >
-                    {file.name}
-                  </button>
-                </li>
+        }
+      >
+        <main
+          style={{
+            display: "grid",
+            "grid-template-columns": "240px 480px  1fr",
+          }}
+          class="overflow-hidden"
+        >
+          <section class="overflow-x-auto overflow-y-scroll">
+            <ol>
+              <For each={files()}>
+                {(file) => (
+                  <li>
+                    <button
+                      onClick={() => setSelectedFile(file)}
+                      class="w-full px-2 text-start transition-colors hover:bg-slate-800"
+                      classList={{
+                        "text-white/30": !!(
+                          query() && !allNodes().get(file.path)?.length
+                        ),
+                        "bg-cyan-700 hover:bg-cyan-600":
+                          file === selectedFile(),
+                      }}
+                    >
+                      {file.name}
+                    </button>
+                  </li>
+                )}
+              </For>
+            </ol>
+          </section>
+          <section
+            class="overflow-x-auto overflow-y-scroll"
+            data-tree-walk-root={true}
+          >
+            <For
+              each={selectedNodes()}
+              fallback={
+                selectedFile() && (
+                  <div class="flex h-full">
+                    <NonIdealState illustration="magnifier" title="No results">
+                      No results in:{" "}
+                      <InlineCode>{selectedFile()!.path}</InlineCode>
+                    </NonIdealState>
+                  </div>
+                )
+              }
+            >
+              {(node) => (
+                <NodeViewer node={node} onPointer={setIndexRange} depth={0} />
               )}
             </For>
-          </ol>
-        </section>
-        <section
-          class="overflow-x-auto overflow-y-scroll"
-          data-tree-walk-root={true}
-        >
-          <For each={selectedNodes()}>
-            {(node) => (
-              <NodeViewer node={node} onPointer={setIndexRange} depth={0} />
-            )}
-          </For>
-          <Show when={selectedFile() && !selectedNodes().length}>
-            <p>No results in {selectedFile()?.path}</p>
-          </Show>
-        </section>
-        <section class="overflow-hidden">
-          <CodeViewer
-            code={selectedFile()?.content ?? ""}
-            highlight={indexRange()}
-          />
-        </section>
-      </main>
+          </section>
+          <section class="overflow-hidden">
+            <Show
+              when={selectedFile()}
+              fallback={
+                <div class="flex h-full">
+                  <NonIdealState illustration="code" title="Select a file">
+                    Once you select a file,
+                    <br />
+                    the code will appear here.
+                  </NonIdealState>
+                </div>
+              }
+            >
+              <CodeViewer
+                code={selectedFile()!.content ?? ""}
+                highlight={indexRange()}
+              />
+            </Show>
+          </section>
+        </main>
+      </Show>
     </div>
   );
 }
+
+const InlineCode: ParentComponent = (props) => (
+  <code class="inlin rounded-md bg-black/30 px-2 py-1">{props.children}</code>
+);
 
 const grabCodeFilesFromFolder = async (
   rootDirectory: FileSystemDirectoryHandle,
