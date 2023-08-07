@@ -67,6 +67,6 @@ export const NodeViewer: Component<{
   );
 };
 
-const isIgnorableNode = isOneOf(["SemicolonToken"]);
+const isIgnorableNode = (kind: string) => kind.endsWith("Token");
 
 const AUTO_EXPAND_DEPTH = 10;
