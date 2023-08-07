@@ -1,6 +1,7 @@
 import { Component, For, Show, createSignal } from "solid-js";
 import { IndexRange, TsNode } from "../types";
 import { getProperties } from "../../tsquery/src/traverse";
+import { ExpandChevron } from "./ExpandChevron";
 
 export const NodeViewer: Component<{
   node: TsNode;
@@ -27,13 +28,25 @@ export const NodeViewer: Component<{
         type="button"
         onClick={toggleExpansion}
         disabled={!isExpandable}
-        classList={{ underline: isExpandable }}
+        class="flex w-full items-center px-2 text-start transition-colors hover:bg-slate-800"
       >
-        {nodeProperties.kindName}
-        {nodeProperties.name && <em class="pl-2">{nodeProperties.name}</em>}
+        <Show when={isExpandable}>
+          <span class="pe-1">
+            <ExpandChevron isOpen={isExpanded()} />
+          </span>
+        </Show>
+        <span classList={{ "text-white/70": isExpandable }}>
+          {nodeProperties.kindName}
+        </span>
+        <span class="ml-auto flex gap-1 pl-1 text-white/90">
+          {nodeProperties.name && <em>{nodeProperties.name}</em>}
+          {nodeProperties.value !== undefined && (
+            <em>{`${nodeProperties.value}`}</em>
+          )}
+        </span>
       </button>
       <Show when={isExpanded()}>
-        <ol class="px-2">
+        <ol class="ps-2">
           <For each={childNodes}>
             {(node) => (
               <li>

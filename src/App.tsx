@@ -1,4 +1,11 @@
-import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import {
+  For,
+  Show,
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+} from "solid-js";
 import { FileContent, TsNode } from "./types";
 import { NodeViewer } from "./components/NodeViewer";
 import { codeFileExplorer } from "./utils/CodeFileExplorer";
@@ -6,16 +13,16 @@ import { readBlob } from "./helpers/FileHelpers";
 import { QueryInput } from "./components/QueryInput";
 import { handleSearch } from "./helpers/SearchHelpers";
 import { CodeViewer } from "./components/CodeViewer";
+import { ProjectRepository } from "./utils/ProjectRepo";
 
 function App() {
+  const [lastProject] = createResource(ProjectRepository.getLastProject);
   const [query, setQuery] = createSignal(defaultQuery);
   const [selectedFile, setSelectedFile] = createSignal<FileContent | null>(
     null,
   );
   const [files, setFiles] = createSignal<FileContent[]>([]);
-  const [allNodes, setAllNodes] = createSignal<Map<string, TsNode[]>>(
-    new Map(),
-  );
+  const [allNodes, setAllNodes] = createSignal(new Map<string, TsNode[]>());
   const [indexRange, setIndexRange] = createSignal({
     startIndex: 0,
     endIndex: 0,
@@ -32,7 +39,17 @@ function App() {
   });
 
   const handleOpenFolder = async () => {
-    setFiles(await grabCodeFilesFromFolder());
+    const rootDirectory = await window.showDirectoryPicker();
+    void ProjectRepository.saveProject({ root: rootDirectory }).catch((error) =>
+      console.error("Failed to save project", error),
+    );
+    setFiles(await grabCodeFilesFromFolder(rootDirectory));
+  };
+
+  const restoreLastProject = async () => {
+    const project = lastProject();
+    if (!project) return;
+    setFiles(await grabCodeFilesFromFolder(project.root));
   };
 
   return (
@@ -45,21 +62,32 @@ function App() {
       </header>
       <main
         style={{ display: "grid", "grid-template-columns": "240px 240px  1fr" }}
-        class="overflow-hidden"
+        class="gap-1 overflow-hidden"
       >
         <section class="overflow-auto">
-          <button
-            onClick={handleOpenFolder}
-            class="rounded-md bg-cyan-600 p-1 px-2"
-          >
-            Open Folder
-          </button>
+          <div class="flex gap-2">
+            <button
+              onClick={handleOpenFolder}
+              class="rounded-md bg-cyan-600 p-1 px-2"
+            >
+              Open Folder
+            </button>
+            <Show when={!files().length && lastProject()}>
+              <button
+                class="rounded-md bg-cyan-600 p-1 px-2"
+                onClick={restoreLastProject}
+              >
+                Restore ({lastProject()!.root.name})
+              </button>
+            </Show>
+          </div>
           <ol>
             <For each={files()}>
               {(file) => (
                 <li>
                   <button
                     onClick={() => setSelectedFile(file)}
+                    class="w-full px-2 text-start transition-colors hover:bg-slate-800"
                     classList={{
                       "text-white/30": !allNodes().get(file.path)?.length,
                     }}
@@ -94,8 +122,10 @@ function App() {
 
 const defaultQuery = "ImportDeclaration:has(StringLiteral[text=react])";
 
-const grabCodeFilesFromFolder = async (): Promise<FileContent[]> => {
-  const rootDirectory = await window.showDirectoryPicker();
+const grabCodeFilesFromFolder = async (
+  rootDirectory: FileSystemDirectoryHandle,
+): Promise<FileContent[]> => {
+  await rootDirectory.requestPermission({ mode: "read" });
   const handleMap = await codeFileExplorer.explore(rootDirectory);
   if (
     handleMap.size > MAX_FILE_COUNT_BEFORE_APPROVAL &&
