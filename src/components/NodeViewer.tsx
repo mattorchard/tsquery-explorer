@@ -5,12 +5,13 @@ import { getProperties } from "../../tsquery/src/traverse";
 export const NodeViewer: Component<{
   node: TsNode;
   onPointer: (indexRange: IndexRange) => void;
+  depth: number;
 }> = (props) => {
   const nodeProperties = getProperties(props.node);
   const childNodes = props.node.getChildren();
   const isExpandable = !!childNodes?.length;
-
-  const [isExpanded, setIsExpanded] = createSignal(false);
+  const expandedByDefault = isExpandable && props.depth < AUTO_EXPAND_DEPTH;
+  const [isExpanded, setIsExpanded] = createSignal(expandedByDefault);
   const toggleExpansion = () => {
     setIsExpanded((e) => !e);
   };
@@ -36,7 +37,11 @@ export const NodeViewer: Component<{
           <For each={childNodes}>
             {(node) => (
               <li>
-                <NodeViewer node={node} onPointer={props.onPointer} />
+                <NodeViewer
+                  node={node}
+                  onPointer={props.onPointer}
+                  depth={props.depth + 1}
+                />
               </li>
             )}
           </For>
@@ -45,3 +50,5 @@ export const NodeViewer: Component<{
     </div>
   );
 };
+
+const AUTO_EXPAND_DEPTH = 3;

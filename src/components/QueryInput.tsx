@@ -12,10 +12,11 @@ const getParserError = (draft: string) => {
 };
 
 export const QueryInput: Component<{
+  defaultValue: string;
   onChange: (value: string) => void;
 }> = (props) => {
   let ref: HTMLTextAreaElement;
-  const [draft, setDraft] = createSignal("");
+  const [draft, setDraft] = createSignal(props.defaultValue);
   const [parserError, setParserError] = createSignal("");
   let timeoutId: number | null = null;
 

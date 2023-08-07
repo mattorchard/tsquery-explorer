@@ -3,5 +3,16 @@
 @tailwind utilities;
 
 .debug {
-  background: #2040a0e0;
+  background: #2080e0a0;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(30, 41, 59);
 }

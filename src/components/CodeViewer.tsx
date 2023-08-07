@@ -7,12 +7,15 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
 ) => {
   let monacoContainer: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
+  let decorations: monaco.editor.IEditorDecorationsCollection;
 
   onMount(() => {
     editor = monaco.editor.create(monacoContainer, monacoOptions);
+    decorations = editor.createDecorationsCollection([]);
   });
 
   onCleanup(() => {
+    decorations.clear();
     editor.dispose();
   });
 
@@ -25,7 +28,7 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
     if (!model) return;
     const startPosition = model.getPositionAt(props.highlight.startIndex);
     const endPosition = model.getPositionAt(props.highlight.endIndex);
-    editor.createDecorationsCollection([
+    decorations.set([
       {
         range: new monaco.Range(
           startPosition.lineNumber,
@@ -48,12 +51,13 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
   );
 };
 
-const monacoOptions: monaco.editor.IEditorOverrideServices = {
+const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   value: "",
   language: "typescript",
   theme: "vs-dark",
   readOnly: true,
   scrollBeyondLastLine: false,
+  automaticLayout: true,
   minimap: {
     enabled: false,
   },
