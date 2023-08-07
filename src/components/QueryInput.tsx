@@ -45,10 +45,18 @@ export const QueryInput: Component<{
           value={draft()}
           onInput={(e) => setDraft(e.currentTarget.value)}
           class=" w-full resize-none appearance-none bg-transparent text-xl caret-cyan-400 outline-none"
+          spellcheck={false}
+          autocomplete="off"
         />
       </label>
-      <div class="px-2  text-red-400">
-        {parserError()}
+      <div
+        class="px-2"
+        classList={{
+          "text-cyan-300 opacity-40": !parserError(),
+          "text-red-400": !!parserError(),
+        }}
+      >
+        {parserError() || "Valid Query"}
         &nbsp;
       </div>
     </div>
