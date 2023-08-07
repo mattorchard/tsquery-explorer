@@ -52,10 +52,19 @@ export const CodeViewer: Component<{ code: string; highlight: IndexRange }> = (
   );
 };
 
+monaco.editor.defineTheme("tsquery", {
+  base: "vs-dark",
+  inherit: true,
+  rules: [],
+  colors: {
+    "editor.background": "#020617",
+  },
+});
+
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   value: "",
   language: "typescript",
-  theme: "vs-dark",
+  theme: "tsquery",
   readOnly: true,
   scrollBeyondLastLine: false,
   automaticLayout: true,
