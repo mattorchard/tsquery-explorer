@@ -25,7 +25,11 @@ export const NodeViewer: Component<{
   if (isIgnorableNode(nodeProperties.kindName)) return null;
 
   return (
-    <div onPointerEnter={() => props.onPointer(indexRange)}>
+    <div
+      onPointerEnter={() => props.onPointer(indexRange)}
+      data-start-index={indexRange.startIndex}
+      data-end-index={indexRange.endIndex}
+    >
       <button
         type="button"
         onClick={toggleExpansion}

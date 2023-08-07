@@ -17,7 +17,7 @@ import { ProjectRepository } from "./utils/ProjectRepo";
 
 function App() {
   const [lastProject] = createResource(ProjectRepository.getLastProject);
-  const [query, setQuery] = createSignal(defaultQuery);
+  const [query, setQuery] = createSignal("");
   const [selectedFile, setSelectedFile] = createSignal<FileContent | null>(
     null,
   );
@@ -56,7 +56,7 @@ function App() {
       class="max-h-screen min-h-screen gap-2 overflow-hidden"
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
-      <header>
+      <header class="border-b-8 border-slate-800">
         <QueryInput defaultValue={query()} onChange={setQuery} />
       </header>
       <main
@@ -64,7 +64,7 @@ function App() {
         class="overflow-hidden"
       >
         <section class="overflow-x-auto overflow-y-scroll">
-          <div class="inline-flex gap-1 overflow-hidden rounded-md">
+          <div class="sticky top-0 inline-flex gap-1 overflow-hidden rounded-md">
             <button onClick={handleOpenFolder} class=" bg-cyan-600 p-1 px-2">
               Open Folder
             </button>
@@ -85,7 +85,7 @@ function App() {
                       "text-white/30": !!(
                         query() && !allNodes().get(file.path)?.length
                       ),
-                      "bg-cyan-700": file === selectedFile(),
+                      "bg-cyan-700 hover:bg-cyan-600": file === selectedFile(),
                     }}
                   >
                     {file.name}
@@ -116,8 +116,6 @@ function App() {
   );
 }
 
-const defaultQuery = "" && "ImportDeclaration:has(StringLiteral[text=react])";
-
 const grabCodeFilesFromFolder = async (
   rootDirectory: FileSystemDirectoryHandle,
 ): Promise<FileContent[]> => {
@@ -147,3 +145,17 @@ const grabCodeFilesFromFolder = async (
 const MAX_FILE_COUNT_BEFORE_APPROVAL = 100;
 
 export default App;
+
+// Sample Queries
+/*
+
+VariableDeclaration
+[initializer.expression.name=/^useCue/]
+:has(BindingElement > [name=/^set/])
+
+ImportDeclaration:has(StringLiteral[text=react])
+
+
+VariableDeclaration
+[initializer.expression.name=useContextSafe]
+*/

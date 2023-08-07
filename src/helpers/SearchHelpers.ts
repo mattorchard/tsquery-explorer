@@ -1,14 +1,15 @@
 import { FileContent } from "../types";
-import { ast, query } from "../../tsquery/src";
+import { ast, query, parse } from "../../tsquery/src";
 
-export const handleSearch = async (queryText: string, files: FileContent[]) => {
+export const handleSearch = async (rawQuery: string, files: FileContent[]) => {
   console.time("handleSearch");
+  const selector = rawQuery ? parse(rawQuery.replaceAll(/\r?\n/g, "")) : null;
   const output = new Map(
     files.map((file) => {
       const codeAst = ast(file.content, file.path);
       return [
         file.path,
-        queryText ? query(codeAst, queryText) : codeAst.getChildren(),
+        selector ? query(codeAst, selector) : codeAst.getChildren(),
       ];
     }),
   );
