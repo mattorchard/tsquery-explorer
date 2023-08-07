@@ -39,7 +39,7 @@ export const QueryInput: Component<{
     <div class="flex w-full flex-col">
       <label class="cursor-text p-2">
         <textarea
-          placeholder="Search query"
+          placeholder={placeholder}
           aria-label="Search query"
           ref={ref!}
           value={draft()}
@@ -62,6 +62,11 @@ export const QueryInput: Component<{
     </div>
   );
 };
+
+const placeholder =
+  "Search query" +
+  "\n" +
+  `ex VariableDeclaration[initializer.expression.name=useState]`;
 
 const DEBOUNCE_THRESHOLD = 500;
 

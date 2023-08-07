@@ -18,6 +18,7 @@ import { ProjectRepository } from "./utils/ProjectRepo";
 import { unwrap } from "solid-js/store";
 import { exportToConsole } from "./helpers/ExportHelpers";
 import { NonIdealState } from "./components/NonIdealState";
+import { FileItem } from "./components/FileItem";
 
 function App() {
   const [lastProject] = createResource(ProjectRepository.getLastProject);
@@ -32,6 +33,18 @@ function App() {
   const [indexRange, setIndexRange] = createSignal({
     startIndex: 0,
     endIndex: 0,
+  });
+
+  const sortedFiles = createMemo(() => {
+    const allNodesMap = allNodes();
+    if (allNodesMap.size === 0) return files();
+    return [...files()].sort((a, b) => {
+      const hasSomeA = allNodesMap.get(a.path)?.length;
+      const hasSomeB = allNodesMap.get(b.path)?.length;
+      if (hasSomeA && !hasSomeB) return -1;
+      if (!hasSomeA && hasSomeB) return 1;
+      return a.path.localeCompare(b.path);
+    });
   });
 
   const selectedNodes = createMemo(
@@ -63,6 +76,9 @@ function App() {
     exportToConsole(unwrap(files()), unwrap(allNodes()));
   };
 
+  const controlButtonClazz =
+    "h-full bg-slate-800 px-4 py-2 transition-colors hover:bg-slate-700 active:bg-slate-900";
+
   return (
     <div
       class="max-h-screen min-h-screen overflow-hidden"
@@ -70,7 +86,7 @@ function App() {
     >
       <header
         class="border-b-8 border-slate-800"
-        style={{ display: "grid", "grid-template-columns": "240px 1fr auto" }}
+        style={{ display: "grid", "grid-template-columns": "320px 1fr auto" }}
       >
         <div class="px-4 py-2">
           <h1 class="select-none text-4xl opacity-60">
@@ -84,14 +100,14 @@ function App() {
           <Show when={files().length}>
             <button
               type="button"
-              class="h-full bg-slate-800 px-4 transition-colors hover:bg-slate-700 active:bg-slate-900"
+              class={controlButtonClazz}
               onClick={handleOpenFolder}
             >
               Choose different folder
             </button>
             <button
               type="button"
-              class="h-full bg-slate-800 px-4 transition-colors hover:bg-slate-700 active:bg-slate-900"
+              class={controlButtonClazz}
               onClick={handleDumpToConsole}
             >
               Dump to console
@@ -129,29 +145,21 @@ function App() {
         <main
           style={{
             display: "grid",
-            "grid-template-columns": "240px 320px  1fr",
+            "grid-template-columns": "320px 480px 1fr",
           }}
           class="overflow-hidden"
         >
           <section class="overflow-x-auto overflow-y-scroll">
             <ol>
-              <For each={files()}>
+              <For each={sortedFiles()}>
                 {(file) => (
-                  <li>
-                    <button
-                      onClick={() => setSelectedFile(file)}
-                      class="w-full px-2 text-start transition-colors hover:bg-slate-800"
-                      classList={{
-                        "text-white/30": !!(
-                          query() && !allNodes().get(file.path)?.length
-                        ),
-                        "bg-cyan-700 hover:bg-cyan-600":
-                          file === selectedFile(),
-                      }}
-                    >
-                      {file.name}
-                    </button>
-                  </li>
+                  <FileItem
+                    file={file}
+                    isSelected={file === selectedFile()}
+                    ignoreCount={!query()}
+                    count={allNodes().get(file.path)?.length ?? 0}
+                    onClick={() => setSelectedFile(file)}
+                  />
                 )}
               </For>
             </ol>

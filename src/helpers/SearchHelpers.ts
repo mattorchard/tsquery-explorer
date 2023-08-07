@@ -2,7 +2,8 @@ import { FileContent } from "../types";
 import { ast, query, parse, ScriptKind } from "../../tsquery/src";
 
 export const handleSearch = async (rawQuery: string, files: FileContent[]) => {
-  console.time("handleSearch");
+  const timerKey = `handleSearch::${rawQuery}`;
+  console.time(timerKey);
   const selector = rawQuery ? parse(rawQuery.replaceAll(/\r?\n/g, "")) : null;
   const output = new Map(
     files.map((file) => {
@@ -17,6 +18,6 @@ export const handleSearch = async (rawQuery: string, files: FileContent[]) => {
       ];
     }),
   );
-  console.timeEnd("handleSearch");
+  console.timeEnd(timerKey);
   return output;
 };
