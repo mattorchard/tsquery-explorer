@@ -65,23 +65,39 @@ function App() {
 
   return (
     <div
-      class="max-h-screen min-h-screen gap-2 overflow-hidden"
+      class="max-h-screen min-h-screen overflow-hidden"
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
-      <header class="flex border-b-8 border-slate-800">
-        <div class="flex shrink-0 flex-col">
+      <header
+        class="border-b-8 border-slate-800"
+        style={{ display: "grid", "grid-template-columns": "240px 1fr auto" }}
+      >
+        <div class="px-4 py-2">
+          <h1 class="select-none text-4xl opacity-60">
+            TSQuery
+            <br />
+            Explorer
+          </h1>
+        </div>
+        <QueryInput defaultValue={query()} onChange={setQuery} />
+        <div class="flex flex-col">
           <Show when={files().length}>
             <button
               type="button"
-              class="bg-cyan-600"
+              class="h-full bg-slate-800 px-4 transition-colors hover:bg-slate-700 active:bg-slate-900"
+              onClick={handleOpenFolder}
+            >
+              Choose different folder
+            </button>
+            <button
+              type="button"
+              class="h-full bg-slate-800 px-4 transition-colors hover:bg-slate-700 active:bg-slate-900"
               onClick={handleDumpToConsole}
             >
               Dump to console
             </button>
           </Show>
         </div>
-
-        <QueryInput defaultValue={query()} onChange={setQuery} />
       </header>
 
       <Show
@@ -113,7 +129,7 @@ function App() {
         <main
           style={{
             display: "grid",
-            "grid-template-columns": "240px 480px  1fr",
+            "grid-template-columns": "240px 320px  1fr",
           }}
           class="overflow-hidden"
         >
@@ -150,7 +166,7 @@ function App() {
                 selectedFile() && (
                   <div class="flex h-full">
                     <NonIdealState illustration="magnifier" title="No results">
-                      No results in:{" "}
+                      No matches for query in:{" "}
                       <InlineCode>{selectedFile()!.path}</InlineCode>
                     </NonIdealState>
                   </div>

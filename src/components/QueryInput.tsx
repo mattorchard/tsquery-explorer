@@ -44,7 +44,7 @@ export const QueryInput: Component<{
           ref={ref!}
           value={draft()}
           onInput={(e) => setDraft(e.currentTarget.value)}
-          class=" w-full resize-none appearance-none bg-transparent text-xl caret-cyan-400 outline-none"
+          class=" min-h-[56px] w-full resize-none appearance-none bg-transparent text-xl caret-cyan-400 outline-none"
           spellcheck={false}
           autocomplete="off"
         />
@@ -63,7 +63,7 @@ export const QueryInput: Component<{
   );
 };
 
-const DEBOUNCE_THRESHOLD = 300;
+const DEBOUNCE_THRESHOLD = 500;
 
 const matchScrollHeight = (element: HTMLElement) => {
   element.style.height = "0";

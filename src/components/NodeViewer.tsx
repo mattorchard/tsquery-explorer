@@ -77,7 +77,7 @@ const DetailedNodeViewer: Component<{
         onClick={toggleExpansion}
         onKeyDown={handleTreeNavigate}
         onFocus={handleInteract}
-        class="inner-focus-ring flex w-full items-center px-2 text-start transition-colors hover:bg-slate-800"
+        class="inner-focus-ring flex w-full items-center px-2 text-start transition-colors hover:bg-slate-700"
         data-tree-walk-focus-target={true}
         data-is-expandable={isExpandable}
         data-is-expanded={isExpanded()}
@@ -92,14 +92,16 @@ const DetailedNodeViewer: Component<{
           {props.nodeProperties.kindName}
         </span>
         <span class="ml-auto flex gap-1 pl-1 text-white/90">
-          {props.nodeProperties.name && <em>{props.nodeProperties.name}</em>}
+          {props.nodeProperties.name && (
+            <em class="text-cyan-600">{props.nodeProperties.name}</em>
+          )}
           {props.nodeProperties.value !== undefined && (
-            <em>{`${props.nodeProperties.value}`}</em>
+            <em class="text-cyan-600">{`${props.nodeProperties.value}`}</em>
           )}
         </span>
       </button>
       <Show when={isExpanded()}>
-        <ol class="border-l-[1px] border-dashed border-transparent ps-1 transition-colors focus-within:bg-cyan-700/10 hover:border-white/40">
+        <ol class="border-l-[1px] border-dashed border-transparent ps-2 transition-colors focus-within:bg-cyan-700/10 hover:border-white/40">
           <For each={childNodes}>
             {(node) => (
               <li>
