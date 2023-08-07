@@ -21,7 +21,7 @@ export const NodeViewer: Component<{ node: TsNode }> = (props) => {
         classList={{ underline: isExpandable }}
       >
         {nodeProperties.kindName}
-        {nodeProperties.name && <em>{nodeProperties.name}</em>}
+        {nodeProperties.name && <em class="pl-2">{nodeProperties.name}</em>}
       </button>
       <Show when={isExpanded()}>
         <ol class="px-2">
