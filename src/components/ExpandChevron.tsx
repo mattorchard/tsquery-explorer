@@ -12,13 +12,14 @@ export const ExpandChevron: Component<{ isOpen: boolean }> = (props) => {
       height="1em"
       width="1em"
       xmlns="http://www.w3.org/2000/svg"
+      class="transition-transform"
+      style={
+        props.isOpen
+          ? "transform: rotateZ(0deg);"
+          : "transform: rotateZ(-90deg);"
+      }
     >
-      {/* Todo: Animate */}
-      {props.isOpen ? (
-        <polyline points="6 9 12 15 18 9"></polyline>
-      ) : (
-        <polyline points="18 15 12 9 6 15"></polyline>
-      )}
+      <polyline points="6 9 12 15 18 9"></polyline>
     </svg>
   );
 };
