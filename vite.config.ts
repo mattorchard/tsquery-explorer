@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [
     solid(),
     // @ts-ignore
-    monacoEditorPlugin.default({}),
+    monacoEditorPlugin.default({
+      languageWorkers: ["typescript", "editorWorkerService"],
+    }),
   ],
 });

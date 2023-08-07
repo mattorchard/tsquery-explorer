@@ -28,7 +28,7 @@ export const QueryInput: Component<{
     setParserError(newError);
     if (timeoutId) window.clearTimeout(timeoutId);
     if (!newError) {
-      timeoutId = setTimeout(
+      timeoutId = window.setTimeout(
         () => props.onChange(currentDraft),
         DEBOUNCE_THRESHOLD,
       );
