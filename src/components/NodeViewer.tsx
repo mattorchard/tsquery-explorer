@@ -66,6 +66,7 @@ const DetailedNodeViewer: Component<{
 
   return (
     <div
+      class="node-viewer"
       onPointerOver={handleInteract}
       data-start-index={indexRange.startIndex}
       data-end-index={indexRange.endIndex}
@@ -101,7 +102,7 @@ const DetailedNodeViewer: Component<{
         </span>
       </button>
       <Show when={isExpanded()}>
-        <ol class="border-l-[1px] border-dashed border-transparent ps-2 transition-colors focus-within:bg-cyan-700/10 hover:border-white/40">
+        <ol class="border-dashed border-transparent ps-2">
           <For each={childNodes}>
             {(node) => (
               <li>
