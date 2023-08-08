@@ -149,16 +149,18 @@ function App() {
       <Show
         when={files().length}
         fallback={
-          <div class="m-auto">
-            <div
-              class="cursor-pointer transition-all hover:translate-y-[-.25rem] hover:text-cyan-200"
-              onClick={handleOpenFolder}
-            >
-              <NonIdealState illustration="folder" title="Open a folder">
-                To get started: open a folder containing <br /> some{" "}
-                <InlineCode>js</InlineCode> or
-                <InlineCode>ts</InlineCode> files.
-              </NonIdealState>
+          <>
+            <div class="center-on-screen">
+              <div
+                class="cursor-pointer transition-all hover:translate-y-[-.25rem] hover:text-cyan-200"
+                onClick={handleOpenFolder}
+              >
+                <NonIdealState illustration="folder" title="Open a folder">
+                  To get started: open a folder containing <br /> some{" "}
+                  <InlineCode>js</InlineCode> or
+                  <InlineCode>ts</InlineCode> files.
+                </NonIdealState>
+              </div>
             </div>
             <Show when={lastProject()}>
               <button
@@ -169,7 +171,7 @@ function App() {
                 Reopen previous folder
               </button>
             </Show>
-          </div>
+          </>
         }
       >
         <main
@@ -220,7 +222,7 @@ function App() {
             <Show
               when={selectedFile()}
               fallback={
-                <div class="flex h-full">
+                <div class="center-on-screen">
                   <NonIdealState illustration="code" title="Select a file">
                     Once you select a file,
                     <br />

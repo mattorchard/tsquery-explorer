@@ -21,3 +21,10 @@
   box-shadow: 0 0 0 2px #cffafe inset;
   outline: none;
 }
+
+.center-on-screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
