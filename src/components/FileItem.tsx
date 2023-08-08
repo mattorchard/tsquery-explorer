@@ -13,7 +13,7 @@ export const FileItem: Component<{
       <button
         type="button"
         onClick={props.onClick}
-        class="inline-focus-ring flex w-full items-center px-2 text-start transition-colors"
+        class="inner-focus-ring flex w-full items-center px-2 text-start transition-colors"
         classList={{
           "text-white/30": !props.ignoreCount && props.count === 0,
           "hover:bg-slate-800": !props.isSelected,
