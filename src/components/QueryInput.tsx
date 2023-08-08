@@ -37,7 +37,7 @@ export const QueryInput: Component<{
 
   return (
     <div class="flex w-full flex-col">
-      <label class="cursor-text p-2">
+      <label class="cursor-text px-2 pt-2">
         <textarea
           placeholder={placeholder}
           aria-label="Search query"

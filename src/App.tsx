@@ -19,20 +19,30 @@ import { unwrap } from "solid-js/store";
 import { exportToConsole } from "./helpers/ExportHelpers";
 import { NonIdealState } from "./components/NonIdealState";
 import { FileItem } from "./components/FileItem";
+import { createRegexSafe } from "./helpers/RegexHelpers";
+
+const savedQueryKey = "TSQUERY_SAVED_QUERY_V1";
 
 function App() {
   const [lastProject] = createResource(ProjectRepository.getLastProject);
   const [query, setQuery] = createSignal(
-    localStorage.getItem("DEBUG_QUERY") || "",
+    localStorage.getItem(savedQueryKey) || "",
   );
+  const [fileFilter, setFileFilter] = createSignal("");
   const [selectedFile, setSelectedFile] = createSignal<FileContent | null>(
     null,
   );
-  const [files, setFiles] = createSignal<FileContent[]>([]);
+  const [allFiles, setAllFiles] = createSignal<FileContent[]>([]);
   const [allNodes, setAllNodes] = createSignal(new Map<string, TsNode[]>());
   const [indexRange, setIndexRange] = createSignal({
     startIndex: 0,
     endIndex: 0,
+  });
+
+  const files = createMemo(() => {
+    const pattern = fileFilter() ? createRegexSafe(fileFilter()) : null;
+    if (!pattern) return allFiles();
+    return allFiles().filter((file) => !pattern.test(file.path));
   });
 
   const sortedFiles = createMemo(() => {
@@ -62,22 +72,30 @@ function App() {
       console.error("Failed to save project", error),
     );
     setSelectedFile(null);
-    setFiles(await grabCodeFilesFromFolder(rootDirectory));
+    setAllFiles(await grabCodeFilesFromFolder(rootDirectory));
   };
 
   const handleRestoreLastProject = async () => {
     const project = lastProject();
     if (!project) return;
     setSelectedFile(null);
-    setFiles(await grabCodeFilesFromFolder(project.root));
+    setAllFiles(await grabCodeFilesFromFolder(project.root));
   };
 
   const handleDumpToConsole = () => {
     exportToConsole(unwrap(files()), unwrap(allNodes()));
   };
 
+  const handleSaveQuery = () => {
+    localStorage.setItem(savedQueryKey, query());
+  };
+
+  const handleSetFileFilter = () => {
+    setFileFilter(window.prompt("File filter") ?? "");
+  };
+
   const controlButtonClazz =
-    "h-full bg-slate-800 px-4 py-2 transition-colors hover:bg-slate-700 active:bg-slate-900";
+    "h-full bg-slate-800 px-4 py-3 transition-colors hover:bg-slate-700 active:bg-slate-900";
 
   return (
     <div
@@ -85,7 +103,7 @@ function App() {
       style={{ display: "grid", "grid-template-rows": "auto 1fr" }}
     >
       <header
-        class="border-b-8 border-slate-800"
+        class="items-start border-b-8 border-slate-800"
         style={{ display: "grid", "grid-template-columns": "320px 1fr auto" }}
       >
         <div class="px-4 py-2">
@@ -96,7 +114,7 @@ function App() {
           </h1>
         </div>
         <QueryInput defaultValue={query()} onChange={setQuery} />
-        <div class="flex flex-col">
+        <div class="grid grid-cols-2">
           <Show when={files().length}>
             <button
               type="button"
@@ -108,9 +126,23 @@ function App() {
             <button
               type="button"
               class={controlButtonClazz}
+              onClick={handleSetFileFilter}
+            >
+              Set file exclusion
+            </button>
+            <button
+              type="button"
+              class={controlButtonClazz}
               onClick={handleDumpToConsole}
             >
               Dump to console
+            </button>
+            <button
+              type="button"
+              class={controlButtonClazz}
+              onClick={handleSaveQuery}
+            >
+              Save query
             </button>
           </Show>
         </div>
