@@ -62,6 +62,11 @@ monaco.editor.defineTheme("tsquery", {
   },
 });
 
+// Important Bit #3: Tell typescript to use 'react' for jsx files.
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+  jsx: monaco.languages.typescript.JsxEmit.React,
+});
+
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   value: "",
   language: "typescript",
