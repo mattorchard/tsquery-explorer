@@ -115,36 +115,34 @@ function App() {
         </div>
         <QueryInput defaultValue={query()} onChange={setQuery} />
         <div class="grid grid-cols-2">
-          <Show when={files().length}>
-            <button
-              type="button"
-              class={controlButtonClazz}
-              onClick={handleOpenFolder}
-            >
-              Choose different folder
-            </button>
-            <button
-              type="button"
-              class={controlButtonClazz}
-              onClick={handleSetFileFilter}
-            >
-              Set file exclusion
-            </button>
-            <button
-              type="button"
-              class={controlButtonClazz}
-              onClick={handleDumpToConsole}
-            >
-              Dump to console
-            </button>
-            <button
-              type="button"
-              class={controlButtonClazz}
-              onClick={handleSaveQuery}
-            >
-              Save query
-            </button>
-          </Show>
+          <button
+            type="button"
+            class={controlButtonClazz}
+            onClick={handleOpenFolder}
+          >
+            Choose different folder
+          </button>
+          <button
+            type="button"
+            class={controlButtonClazz}
+            onClick={handleSetFileFilter}
+          >
+            Set file exclusion
+          </button>
+          <button
+            type="button"
+            class={controlButtonClazz}
+            onClick={handleDumpToConsole}
+          >
+            Dump to console
+          </button>
+          <button
+            type="button"
+            class={controlButtonClazz}
+            onClick={handleSaveQuery}
+          >
+            Save query
+          </button>
         </div>
       </header>
 
